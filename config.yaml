@@ -1,0 +1,51 @@
+# --- Data Parameters ---
+data_dir: "train"          # Path to the training data directory (containing class subfolders)
+test_dir: "test"           # Path to the separate test data directory
+image_size: 224            # Target image size (ViT expects square images, e.g., 224, 384)
+batch_size: 8              # Number of samples per batch (adjust based on GPU memory)
+test_size: 0.2             # Proportion of data_dir to use for validation set (e.g., 0.2 = 20%)
+num_workers: 4             # Number of worker processes for data loading (e.g., 2, 4, 8). Increase if CPU is bottleneck.
+
+# --- Model Parameters ---
+model_name: "google/vit-base-patch16-224-in21k" # Hugging Face model identifier
+                                            # Alternatives:
+                                            # "google/vit-base-patch16-224" (Fine-tuned on ImageNet-1k)
+                                            # "google/vit-large-patch16-224-in21k" (Larger model, needs more VRAM)
+                                            # Consider domain-specific pre-trained models if available.
+num_classes: 2             # Number of output classes (NORMAL, PNEUMONIA) - Used in model.py
+dropout_rate: 0.1          # Optional: Dropout rate for the classifier head (e.g., 0.0, 0.1)
+
+# --- Training Hyperparameters ---
+# ---------------------------------------------------------------------------------
+num_epochs: 5             # <<< CHANGED: Maximum number of training epochs set to 10.
+                           # NOTE: This is a short duration for fine-tuning ViT. Performance might be limited.
+# ---------------------------------------------------------------------------------
+accumulation_steps: 4      # Accumulate gradients over X steps to simulate larger batch size (effective_batch_size = batch_size * accumulation_steps)
+                           # Try 4, 8, or 16 depending on memory and desired effective batch size (e.g., 32, 64, 128)
+random_state: 42           # Seed for reproducibility (train/val split, etc.)
+device: "cuda"             # Device to use ("cuda" or "cpu"). Will fallback to cpu if cuda not available.
+
+# --- Optimizer & Scheduler Parameters ---
+learning_rate: 0.00005     # Initial learning rate (5e-5). Common starting point for fine-tuning transformers.
+                           # Might need tuning (e.g., 1e-4, 3e-5, 1e-5).
+weight_decay: 0.01         # Weight decay for AdamW optimizer (helps prevent overfitting)
+warmup_steps: 200          # Number of linear warmup steps for the learning rate scheduler.
+                           # Adjusted slightly lower for fewer total epochs (e.g., ~1 epoch worth). 0 means no warmup.
+
+# --- Optional: Layer Freezing Parameters (Used if freeze_backbone_epochs > 0) ---
+freeze_backbone_epochs: 0  # Number of initial epochs to train *only* the classifier head.
+                           # Set > 0 (e.g., 3) to enable. Set to 0 to train all layers from start.
+unfreeze_learning_rate: 0.00001 # Learning rate to use AFTER unfreezing the backbone (if freeze_backbone_epochs > 0).
+                           # Typically lower than the initial LR (e.g., 1e-5).
+# unfreeze_warmup_steps: 0 # Optional: Separate warmup steps after unfreezing.
+
+# --- Early Stopping Parameters ---
+# NOTE: With only 10 epochs, patience=5 might mean early stopping rarely triggers unless overfitting happens *very* fast.
+early_stopping_patience: 5 # Number of epochs to wait for improvement before stopping training.
+                            # Keep it lower than num_epochs.
+early_stopping_metric: "loss" # Metric to monitor for improvement ('loss', 'f1', 'accuracy').
+                            # 'loss' (lower is better) or 'f1'/'accuracy' (higher is better).
+
+# --- Paths ---
+model_path: "models/ViT_pneumonia_best_model_10epochs.pth" # Path to save the *best* model checkpoint based on validation metric.
+# report_dir: "reports"    # Directory to save confusion matrix, logs etc. (Handled in train.py now)
