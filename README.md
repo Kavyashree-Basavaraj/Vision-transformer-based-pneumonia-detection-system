@@ -1,55 +1,116 @@
-Agentic AI Learning Platform - Training & Inference
-This project implements an AI Agentic learning system using PyTorch. The workflow is designed to be modular, separating the model architecture, data processing, training, and prediction phases.
-🚀 How to Run in Google Colab
-To replicate the results, follow these steps in a Google Colab environment with a GPU.
-1. Environment Setup
-First, mount your Google Drive to access the source code and dataset:
-code
-Python
-from google.colab import drive
-drive.mount('/content/drive')
-2. Hardware Verification
-Check if a GPU is allocated to your session and verify CUDA drivers:
-code
-Bash
-!nvidia-smi
-3. Device Configuration
-Initialize the computation device (GPU/CUDA). If a GPU is not available, the system will automatically fallback to CPU:
-code
-Python
-import torch
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-print(f"Using device: {device}")
-4. Project Execution Pipeline
-Run the scripts in the following order to build, train, and test the model.
-Note: Ensure your scripts are located in /content/drive/MyDrive/data/src/
-Step A: Initialize Model Architecture
-Defines the neural network structure.
-code
-Bash
-%run /content/drive/MyDrive/data/src/model.py
-Step B: Load and Preprocess Data
-Handles data ingestion, normalization, and batching.
-code
-Bash
-%run /content/drive/MyDrive/data/src/data_loader.py
-Step C: Train the Model
-Starts the training loop, optimizes weights, and saves the best model checkpoints.
-code
-Bash
-%run /content/drive/MyDrive/data/src/train.py
-Step D: Run Inference (Prediction)
-Uses the trained model to generate predictions on new data.
-code
-Bash
-%run /content/drive/MyDrive/data/src/predict.py
-📁 Project Structure
-model.py: Contains the PyTorch neural network classes.
-data_loader.py: Script for loading the dataset and creating DataLoaders.
-train.py: The training logic, loss functions, and optimizer settings.
-predict.py: Script for loading a saved model and running inference.
-🛠 Prerequisites
-Python 3.x
-PyTorch
-CUDA-enabled GPU (Recommended)
-Google Colab account
+# Vision Transformer-Based Pneumonia Detection System
+
+This project builds a pneumonia classification pipeline using a pretrained Vision Transformer (ViT) model fine-tuned on chest X-ray images. It includes a Jupyter notebook for exploration and modular Python scripts for data loading, training, evaluation, and inference.
+
+## What this project does
+
+The system classifies chest X-ray images into two categories:
+
+- NORMAL
+- PNEUMONIA
+
+It uses a Hugging Face pretrained ViT backbone and adds a classification head for binary image classification.
+
+## Project structure
+
+- ViT_PNEUMONIA_DETECTION.ipynb: End-to-end notebook containing data download, preprocessing, training, and evaluation steps.
+- config.yaml: Configuration file for dataset paths, model settings, training hyperparameters, and output paths.
+- src/model.py: ViT model architecture and model save/load utilities.
+- src/data_loader.py: Dataset loading, image transformations, train/validation/test splitting, and DataLoader creation.
+- src/train.py: Training loop, validation, metrics, early stopping, and model checkpointing.
+- src/predict.py: Command-line inference for predicting labels for new images.
+- train/: Training dataset directory with class subfolders.
+- test/: Test dataset directory with class subfolders.
+
+## Dataset
+
+The project expects image folders organized as:
+
+- train/NORMAL
+- train/PNEUMONIA
+- test/NORMAL
+- test/PNEUMONIA
+
+The notebook includes steps to download a public chest X-ray pneumonia dataset from Kaggle.
+
+## Requirements
+
+Install the required Python packages:
+
+```bash
+pip install torch torchvision transformers pillow matplotlib seaborn scikit-learn pyyaml tqdm
+```
+
+Recommended:
+
+- Python 3.9+ or 3.10+
+- CUDA-enabled GPU for faster training
+- Google Colab for notebook-based experimentation
+
+## Setup
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/your-username/Vision-transformer-based-pneumonia-detection-system.git
+cd Vision-transformer-based-pneumonia-detection-system
+```
+
+2. Place the dataset in the appropriate folders or update the paths in config.yaml.
+
+3. Review config.yaml and adjust values such as:
+
+- data_dir
+- test_dir
+- image_size
+- batch_size
+- num_epochs
+- learning_rate
+- model_path
+
+## Running the project
+
+### Option 1: Use the notebook
+
+Open ViT_PNEUMONIA_DETECTION.ipynb in Jupyter or VS Code and run the cells in order.
+
+### Option 2: Run the training script
+
+```bash
+python src/train.py
+```
+
+This will:
+
+- load the data
+- create train/validation/test DataLoaders
+- initialize the ViT model
+- train the model
+- save the best model checkpoint
+- generate evaluation metrics and visual reports
+
+### Option 3: Run inference on a new image
+
+```bash
+python src/predict.py
+```
+
+The script will prompt you for an image path and print the predicted class along with the confidence score.
+
+## Output files
+
+Training and evaluation outputs may include:
+
+- model checkpoints in the path defined by model_path in config.yaml
+- confusion matrix images in the reports/ folder
+- classification report text files in the reports/ folder
+
+## Notes
+
+- The scripts are designed to work with a pretrained ViT from Hugging Face, so internet access may be required for the first run.
+- GPU usage is strongly recommended for faster training.
+- If you run the code in Google Colab, you may need to update the file paths used in the scripts to match your mounted Drive location.
+
+## License
+
+This project is intended for educational and research purposes.
