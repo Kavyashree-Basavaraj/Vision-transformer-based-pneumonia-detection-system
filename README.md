@@ -105,6 +105,12 @@ Training and evaluation outputs may include:
 - confusion matrix images in the reports/ folder
 - classification report text files in the reports/ folder
 
+### Sample output images
+
+![Normal output](sample%20output%20image/Normal%20output.png)
+
+![Pneumonia output](sample%20output%20image/Pneumonia%20output.png)
+
 ## Notes
 
 - The scripts are designed to work with a pretrained ViT from Hugging Face, so internet access may be required for the first run.
